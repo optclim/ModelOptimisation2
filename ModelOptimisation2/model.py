@@ -1,7 +1,7 @@
 __all__ = ['NMLValue', 'BaseNamelistValue', 'SimpleNamelistValue',
            'NamelistModel']
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Sequence, Dict
 from pathlib import Path
@@ -36,7 +36,7 @@ class SimpleNamelistValue(BaseNamelistValue):
                          value=value)]
 
 
-class NamelistModel(ABCMeta):
+class NamelistModel:
     NAMELIST_MAP = {}
 
     def __init__(self, directory: Path):
@@ -63,7 +63,7 @@ class NamelistModel(ABCMeta):
         for nml in output:
             nmlname = self.directory / nml
             if nmlname.exists():
-                old = nmlname.with_suffic('.nml~')
+                old = nmlname.with_suffix('.nml~')
                 nmlname.replace(old)
                 f90nml.patch(old, output[nml], nmlname)
             else:
