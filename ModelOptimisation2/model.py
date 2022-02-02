@@ -46,7 +46,8 @@ class NamelistModel:
     def directory(self) -> Path:
         return self._directory
 
-    def write_params(self, params: Dict[str, Any]) -> None:
+    def process_params(self, params: Dict[str, Any]) -> \
+            Dict[Path, Dict[str, Dict[str, Any]]]:
         output = {}
         # map input parameters to output namelist files
         for key in params:
@@ -58,6 +59,10 @@ class NamelistModel:
                 if nml.nmlgroup not in output[nml.nmlfile]:
                     output[nml.nmlfile][nml.nmlgroup] = {}
                 output[nml.nmlfile][nml.nmlgroup][nml.nmlkey] = nml.value
+        return output
+
+    def write_params(self, params: Dict[str, Any]) -> None:
+        output = self.process_params(params)
 
         # write output namelist files
         for nml in output:
