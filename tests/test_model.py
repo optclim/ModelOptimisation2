@@ -3,7 +3,7 @@ from pathlib import Path
 from ModelOptimisation2.model import SimpleNamelistValue
 from ModelOptimisation2.model import NamelistModel
 
-NML1 = \  # noqa E122
+NML1 = \
 """&grp1
     p1 = {paramA}
     p2 = {paramB}
@@ -14,7 +14,7 @@ NML1 = \  # noqa E122
 /
 """
 
-NML2 = \  # noqa E122
+NML2 = \
 """&grp1
     p1 = {paramD}
 /
