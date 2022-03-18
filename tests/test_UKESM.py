@@ -3,8 +3,7 @@ from pathlib import Path
 
 from ModelOptimisation2.UKESM import UKESM
 
-CONFIG = \
-"""
+CONFIG = """
 [file:ATMOSCNTL]
 source=namelist:configid namelist:nlstcgen namelist:nlst_mpp namelist:run_track namelist:run_calc_pmsl namelist:lbc_options namelist:run_nudging namelist:run_sl namelist:run_diffusion namelist:run_cosp namelist:radfcdia namelist:r2swclnl namelist:r2lwclnl namelist:clmchfcg namelist:acp namelist:acdiag namelist:jules_nvegparm namelist:jules_pftparm namelist:jules_triffid namelist:jules_elevate (namelist:jules_urban2t_param) namelist:iau_nl namelist:tuning_segments (namelist:nlstcall_pp(:)) (namelist:nlstcall_nc(:)) namelist:nlstcall_nc_options
 
