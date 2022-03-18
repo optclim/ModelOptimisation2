@@ -4,8 +4,10 @@ import json
 from pathlib import Path
 
 from .UKESM import UKESM
+from .MITgcm import MITgcm
 
-MODELS = {'UKESM': UKESM}
+MODELS = {'UKESM': UKESM,
+          'MITgcm': MITgcm}
 
 
 def main():
