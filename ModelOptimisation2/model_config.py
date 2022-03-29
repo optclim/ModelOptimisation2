@@ -5,9 +5,11 @@ from pathlib import Path
 
 from .UKESM import UKESM
 from .MITgcm import MITgcm
+from .HadCM3 import HadCM3
 
 MODELS = {'UKESM': UKESM,
-          'MITgcm': MITgcm}
+          'MITgcm': MITgcm,
+          'HadCM3': HadCM3}
 
 
 def main():
