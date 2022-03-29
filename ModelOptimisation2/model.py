@@ -1,10 +1,12 @@
 __all__ = ['NMLValue', 'BaseNamelistValue', 'SimpleNamelistValue',
-           'NamelistModel']
+           'RepeatedNamelistValue', 'InterpolatedValue', 'NamelistModel']
 
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Sequence, Dict
 from pathlib import Path
+from scipy.interpolate import interp1d
+from numpy.typing import ArrayLike
 import logging
 import f90nml
 
@@ -18,26 +20,60 @@ class NMLValue:
 
 
 class BaseNamelistValue:
+    def __init__(self, nmlfile: str, nmlgroup: str):
+        self._nmlfile = nmlfile
+        self._nmlgroup = nmlgroup
+
+    def _get_nmlval(self, key, value):
+        return NMLValue(nmlfile=self._nmlfile,
+                        nmlgroup=self._nmlgroup,
+                        nmlkey=key,
+                        value=value)
+
     @abstractmethod
     def __call__(self, value) -> Sequence[NMLValue]:
         pass
 
 
 class SimpleNamelistValue(BaseNamelistValue):
-    def __init__(self, nmlfile: Path, nmlgroup: str, nmlkey: str):
-        self._nmlfile = nmlfile
-        self._nmlgroup = nmlgroup
+    def __init__(self, nmlfile: str, nmlgroup: str, nmlkey: str):
+        super().__init__(nmlfile, nmlgroup)
         self._nmlkey = nmlkey
 
-    def __call__(self, value: any) -> Sequence[NMLValue]:
-        return [NMLValue(nmlfile=self._nmlfile,
-                         nmlgroup=self._nmlgroup,
-                         nmlkey=self._nmlkey,
-                         value=value)]
+    def __call__(self, value: Any) -> Sequence[NMLValue]:
+        return [self._get_nmlval(self._nmlkey, value)]
+
+
+class RepeatedNamelistValue(BaseNamelistValue):
+    def __init__(self, nmlfile: str, nmlgroup: str, nmlkeys: Sequence[str]):
+        super().__init__(nmlfile, nmlgroup)
+        self._nmlkeys = nmlkeys
+
+    def __call__(self, value: Any) -> Sequence[NMLValue]:
+        values = []
+        for k in self._nmlkeys:
+            values.append(self._get_nmlval(k, value))
+        return values
+
+
+class InterpolatedValue(BaseNamelistValue):
+    def __init__(self, nmlfile: str, nmlgroup: str,
+                 nmlkey1: str, nmlkey2: str,
+                 x: ArrayLike, y: ArrayLike):
+        super().__init__(nmlfile, nmlgroup)
+        self._nmlkey1 = nmlkey1
+        self._nmlkey2 = nmlkey2
+
+        self._interp = interp1d(x, y, kind='linear', bounds_error=True,
+                                assume_sorted=True)
+
+    def __call__(self, value):
+        return [self._get_nmlval(self._nmlkey1, value=value),
+                self._get_nmlval(self._nmlkey2, value=self._interp(value))]
 
 
 class NamelistModel:
-    NAMELIST_MAP = {}
+    NAMELIST_MAP: Dict[str, BaseNamelistValue] = {}
 
     def __init__(self, directory: Path):
         self._directory = directory
@@ -48,7 +84,7 @@ class NamelistModel:
 
     def process_params(self, params: Dict[str, Any]) -> \
             Dict[Path, Dict[str, Dict[str, Any]]]:
-        output = {}
+        output: Dict[Path, Dict[str, Dict[str, Any]]] = {}
         # map input parameters to output namelist files
         for key in params:
             if key not in self.NAMELIST_MAP:
