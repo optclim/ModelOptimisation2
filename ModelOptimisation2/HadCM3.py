@@ -31,7 +31,7 @@ class SphIce(BaseNamelistValue):
 
 class RunName(BaseNamelistValue):
     def __init__(self):
-        super().__init__(self, 'CNTLALL', 'NLSTCALL')
+        super().__init__('CNTLALL', 'NLSTCALL')
 
     def __call__(self, value):
         return [self._get_nmlval('EXPT_ID', value[:4]),
