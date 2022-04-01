@@ -69,7 +69,8 @@ class InterpolatedValue(BaseNamelistValue):
 
     def __call__(self, value):
         return [self._get_nmlval(self._nmlkey1, value=value),
-                self._get_nmlval(self._nmlkey2, value=self._interp(value))]
+                self._get_nmlval(self._nmlkey2,
+                                 value=float(self._interp(value)))]
 
 
 class NamelistModel:
