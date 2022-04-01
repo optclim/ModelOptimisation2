@@ -12,6 +12,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'f90nml',
+        'ObjectiveFunction',
     ],
     extras_require={
         'lint': [
