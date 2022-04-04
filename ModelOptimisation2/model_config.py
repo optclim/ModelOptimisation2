@@ -40,7 +40,7 @@ def main():
     if args.parameters is not None:
         params = json.loads(args.parameters.read_text())
         model = args.model_type
-    else:
+    elif args.config is not None:
         config = ObjectiveFunction.ObjFunConfig(args.config)
         model = config.cfg['setup']['model']
         if args.default_values:
@@ -49,8 +49,10 @@ def main():
             runid = None
         else:
             try:
-                runid, params = config.objectiveFunction.get_new(with_id=True)
-            except ObjectiveFunction.NoNewRun as e:
+                runid, params = config.objectiveFunction.get_with_state(
+                    ObjectiveFunction.LookupState.NEW, with_id=True,
+                    new_state=ObjectiveFunction.LookupState.CONFIGURING)
+            except LookupError as e:
                 parser.error(e)
             cdir = Path(f'run_{runid:04d}')
 
@@ -64,9 +66,15 @@ def main():
             shutil.copytree(args.clone, modeldir)
             if runid is not None:
                 (modeldir / 'objfun.runid').write_text(f'{runid}')
+    else:
+        parser.error('need to specify either parameter set or config file')
 
     model = MODELS[model](modeldir)
     model.write_params(params)
+
+    if args.config is not None:
+        config.objectiveFunction.setState(
+            runid, ObjectiveFunction.LookupState.CONFIGURED)
 
     print(modeldir)
 
