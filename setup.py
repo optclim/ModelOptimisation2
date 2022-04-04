@@ -26,6 +26,7 @@ setup(
         'console_scripts': [
             'mo2-write = ModelOptimisation2.write_config:main',
             'mo2-configure = ModelOptimisation2.model_config:main',
+            'mo2-transition = ModelOptimisation2.transition:main',
         ],
     },
     author=author,
