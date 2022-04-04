@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'modeloptimisation2-create = ModelOptimisation2.model_config:main',
+            'mo2-write = ModelOptimisation2.write_config:main',
+            'mo2-configure = ModelOptimisation2.model_config:main',
         ],
     },
     author=author,
