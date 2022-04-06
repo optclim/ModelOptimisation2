@@ -3,6 +3,8 @@ import logging
 from pathlib import Path
 import ObjectiveFunction
 
+from .config import ModelOptimisationConfig
+
 STATES = ObjectiveFunction.LookupState._member_names_
 
 
@@ -24,7 +26,7 @@ def main():
     if new_state.value <= current_state.value:
         parser.error('new state must follow current state')
 
-    config = ObjectiveFunction.ObjFunConfig(args.config)
+    config = ModelOptimisationConfig(args.config)
 
     try:
         runid, params = config.objectiveFunction.get_with_state(
@@ -32,15 +34,7 @@ def main():
     except LookupError as e:
         parser.error(e)
 
-    modeldir = config.basedir / Path(f'run_{runid:04d}')
-
-    if not modeldir.exists():
-        parser.error(f'model directory {modeldir} does not exist')
-    runid_name = modeldir / 'objfun.runid'
-    if not runid_name.exists():
-        parser.error(f'run ID file {runid_name} does not exist')
-    if runid_name.read_text() != f'{runid}':
-        parser.error('run ID does not match')
+    modeldir = config.modelDir(runid)
 
     print(modeldir)
 

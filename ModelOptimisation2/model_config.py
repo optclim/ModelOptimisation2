@@ -4,7 +4,7 @@ from pathlib import Path
 import shutil
 import ObjectiveFunction
 
-from .config import MODELS
+from .config import ModelOptimisationConfig
 
 
 def main():
@@ -20,13 +20,11 @@ def main():
                         help="model setup to clone")
     args = parser.parse_args()
 
-    config = ObjectiveFunction.ObjFunConfig(args.config)
-    model = config.cfg['setup']['model']
+    config = ModelOptimisationConfig(args.config)
     modeldir = config.basedir
 
     if args.default_values:
         params = config.values
-        cdir = Path('default')
         runid = None
     else:
         try:
@@ -35,20 +33,15 @@ def main():
                 new_state=ObjectiveFunction.LookupState.CONFIGURING)
         except LookupError as e:
             parser.error(e)
-        cdir = Path(f'run_{runid:04d}')
 
     if args.clone:
-        modeldir = modeldir / cdir
         clonedir = Path(args.clone)
         if not clonedir.is_dir():
             parser.error(f'clone directory {clonedir} does not exist')
-        if modeldir.exists():
-            parser.error(f'target directory {modeldir} already exists')
-        shutil.copytree(args.clone, modeldir)
-        if runid is not None:
-            (modeldir / 'objfun.runid').write_text(f'{runid}')
+        modeldir = config.modelDir(runid, create=True)
+        shutil.copytree(args.clone, modeldir, dirs_exist_ok=True)
 
-    model = MODELS[model](modeldir)
+    model = config.model(modeldir)
     model.write_params(params)
 
     config.objectiveFunction.setState(
