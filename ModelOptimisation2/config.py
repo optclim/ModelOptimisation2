@@ -15,9 +15,12 @@ MODELS = {'DummyModel': DummyModel,
 
 
 class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
-    defaultCfgStr = ObjectiveFunction.ObjFunConfig.defaultCfgStr.replace(
-        'objfun = string(default=misfit)', 'objfun = string(default=misfit)\n'
-        'model = string(default=DummyModel)') + """
+    setupCfgStr = ObjectiveFunction.ObjFunConfig.setupCfgStr.replace(
+        'objfun = string(default=misfit)',
+        'objfun = string(default=misfit)\n'
+        'model = string(default=DummyModel)\n'
+        'clone = string(default=None)')
+    modeloptCfgStr = """
     [scales]
       __many__ = float
     """
@@ -31,6 +34,10 @@ class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
         self._model = None
 
     @property
+    def defaultCfgStr(self):
+        return super().defaultCfgStr + '\n' + self.modeloptCfgStr
+
+    @property
     def scales(self):
         if self._scales is None:
             self._scales = {}
@@ -40,6 +47,11 @@ class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
                 else:
                     self._scales[obs] = 1.
         return self._scales
+
+    @property
+    def cloneDir(self):
+        if self.cfg['setup']['clone'] is not None:
+            return self.expand_path(self.cfg['setup']['clone'])
 
     def modelDir(self, runID, create=False):
         if runID is None:
@@ -70,3 +82,11 @@ class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
         if self._model is None:
             self._model = MODELS[self.cfg['setup']['model']]
         return self._model
+
+
+if __name__ == '__main__':
+    import sys
+    from pprint import pprint
+    config = ModelOptimisationConfig(Path(sys.argv[1]))
+    pprint(config.cfg)
+    print(config.cloneDir)

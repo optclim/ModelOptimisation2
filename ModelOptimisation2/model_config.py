@@ -16,12 +16,21 @@ def main():
     parser.add_argument('-d', '--default-values', action='store_true',
                         default=False,
                         help="use default values from config file")
-    parser.add_argument('-C', '--clone', required=True,
+    parser.add_argument('-C', '--clone',
                         help="model setup to clone")
     args = parser.parse_args()
 
     config = ModelOptimisationConfig(args.config)
     modeldir = config.basedir
+
+    if args.clone is not None:
+        clonedir = Path(args.clone)
+    else:
+        clonedir = config.cloneDir
+    if clonedir is None:
+        parser.error('no clone directory specified')
+    if not clonedir.is_dir():
+        parser.error(f'clone directory {clonedir} does not exist')
 
     if args.default_values:
         params = config.values
@@ -34,12 +43,8 @@ def main():
         except LookupError as e:
             parser.error(e)
 
-    if args.clone:
-        clonedir = Path(args.clone)
-        if not clonedir.is_dir():
-            parser.error(f'clone directory {clonedir} does not exist')
-        modeldir = config.modelDir(runid, create=True)
-        shutil.copytree(args.clone, modeldir, dirs_exist_ok=True)
+    modeldir = config.modelDir(runid, create=True)
+    shutil.copytree(clonedir, modeldir, dirs_exist_ok=True)
 
     model = config.model(modeldir)
     model.write_params(params)
