@@ -3,10 +3,10 @@ __all__ = ['MODELS', 'ModelOptimisationConfig']
 from pathlib import Path
 
 import ObjectiveFunction
-from .dummy import DummyModel
-from .UKESM import UKESM
-from .MITgcm import MITgcm
-from .HadCM3 import HadCM3
+from .config_dummy import DummyModel
+from .config_UKESM import UKESM
+from .config_MITgcm import MITgcm
+from .config_HadCM3 import HadCM3
 
 MODELS = {'DummyModel': DummyModel,
           'UKESM': UKESM,

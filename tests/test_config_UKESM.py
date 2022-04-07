@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 
-from ModelOptimisation2.UKESM import UKESM
+from ModelOptimisation2.config_UKESM import UKESM
 
 CONFIG = """
 [file:ATMOSCNTL]
