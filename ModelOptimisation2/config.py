@@ -22,6 +22,8 @@ class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
       __many__ = float
     """
 
+    RUNID = Path('objfun.runid')
+
     def __init__(self, fname: Path) -> None:
         super().__init__(fname)
 
@@ -45,7 +47,7 @@ class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
         else:
             cdir = Path(f'run_{runID:04d}')
         modeldir = self.basedir / cdir
-        runid_name = modeldir / 'objfun.runid'
+        runid_name = modeldir / self.RUNID
         if create:
             if modeldir.exists():
                 raise RuntimeError(
