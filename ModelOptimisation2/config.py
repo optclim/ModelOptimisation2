@@ -17,7 +17,10 @@ MODELS = {'DummyModel': DummyModel,
 class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
     defaultCfgStr = ObjectiveFunction.ObjFunConfig.defaultCfgStr.replace(
         'objfun = string(default=misfit)', 'objfun = string(default=misfit)\n'
-        'model = string(default=DummyModel)')
+        'model = string(default=DummyModel)') + """
+    [scales]
+      __many__ = float
+    """
 
     def __init__(self, fname: Path) -> None:
         super().__init__(fname)
