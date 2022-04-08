@@ -49,8 +49,9 @@ def main():
     model = config.model(modeldir)
     model.write_params(params)
 
-    config.objectiveFunction.setState(
-        runid, ObjectiveFunction.LookupState.CONFIGURED)
+    if runid is not None:
+        config.objectiveFunction.setState(
+            runid, ObjectiveFunction.LookupState.CONFIGURED)
 
     print(modeldir)
 
