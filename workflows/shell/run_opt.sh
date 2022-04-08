@@ -18,10 +18,12 @@ if [ ! -e "$CONFIGURE" ]; then
 fi
 
 ret=1
-while [ $ret = 1 ]; do
-    objfun-dfols $CFG
+while [ $ret != 0 ]; do
+    mo2-optimise $CFG
     ret=$?
     if [ $ret = 1 ]; then
 	$CONFIGURE $CFG &
+    elif [ $ret = 2 ]; then
+	wait
     fi
 done

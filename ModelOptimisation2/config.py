@@ -15,11 +15,16 @@ MODELS = {'DummyModel': DummyModel,
 
 
 class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
-    setupCfgStr = ObjectiveFunction.ObjFunConfig.setupCfgStr.replace(
-        'objfun = string(default=misfit)',
-        'objfun = string(default=misfit)\n'
-        'model = string(default=DummyModel)\n'
-        'clone = string(default=None)')
+    setupCfgStr = """
+    [setup]
+      study = string() # the name of the study
+      scenario = string() # the name of the scenario
+      basedir = string() # the base directory
+      db = string(default=None) # SQLAlchemy DB connection string
+      model = string(default=DummyModel)
+      clone = string(default=None)
+    """
+
     modeloptCfgStr = """
     [scales]
       __many__ = float
@@ -36,6 +41,11 @@ class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
     @property
     def defaultCfgStr(self):
         return super().defaultCfgStr + '\n' + self.modeloptCfgStr
+
+    @property
+    def objfunType(self):
+        """the objective function type"""
+        return "simobs"
 
     @property
     def scales(self):
