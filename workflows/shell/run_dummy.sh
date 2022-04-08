@@ -19,12 +19,21 @@ else
     DUMMY=$(realpath $DUMMY)
 fi
 
+RUN_POSTPROCESSING=$(dirname $0)/postprocess_dummy.sh
+if [ ! -e "$RUN_POSTPROCESSING" ]; then
+    echo "could not find postprocessing script"
+    exit 1
+fi
+
 # get configured run
 MODELDIR=$(mo2-transition $CFG CONFIGURED ACTIVE) || exit 1
 
 # run it
-cd $MODELDIR
+pushd $MODELDIR
 $DUMMY config.nml results.nc || exit 1
 
 # mark it as completed
 mo2-transition $CFG ACTIVE RUN -i || exit 1
+popd
+
+$RUN_POSTPROCESSING $CFG
