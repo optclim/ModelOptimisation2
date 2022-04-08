@@ -27,6 +27,7 @@ setup(
             'mo2-write = ModelOptimisation2.write_config:main',
             'mo2-configure = ModelOptimisation2.model_config:main',
             'mo2-transition = ModelOptimisation2.transition:main',
+            'mo2-simobs_dummy = ModelOptimisation2.simobs_dummy:main',
         ],
     },
     author=author,
