@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import xarray
 import pandas
-import ObjectiveFunction
+import ObjectiveFunction_client
 
 from .config import ModelOptimisationConfig
 
@@ -32,8 +32,8 @@ def main():
     else:
         try:
             runid, params = config.objectiveFunction.get_with_state(
-                ObjectiveFunction.LookupState.RUN, with_id=True,
-                new_state=ObjectiveFunction.LookupState.POSTPROCESSING)
+                ObjectiveFunction_client.LookupState.RUN, with_id=True,
+                new_state=ObjectiveFunction_client.LookupState.POSTPROCESSING)
         except LookupError as e:
             parser.error(e)
         modeldir = config.modelDir(runid)

@@ -1,11 +1,11 @@
 import argparse
 import logging
 from pathlib import Path
-import ObjectiveFunction
+import ObjectiveFunction_client
 
 from .config import ModelOptimisationConfig
 
-STATES = ObjectiveFunction.LookupState._member_names_
+STATES = ObjectiveFunction_client.LookupState._member_names_
 
 
 def main():
@@ -23,8 +23,8 @@ def main():
                         "If no ID is specified read it from objfun.runid")
     args = parser.parse_args()
 
-    current_state = ObjectiveFunction.LookupState[args.current]
-    new_state = ObjectiveFunction.LookupState[args.new]
+    current_state = ObjectiveFunction_client.LookupState[args.current]
+    new_state = ObjectiveFunction_client.LookupState[args.new]
 
     if new_state.value <= current_state.value:
         parser.error('new state must follow current state')

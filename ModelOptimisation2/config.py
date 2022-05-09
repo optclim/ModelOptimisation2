@@ -2,7 +2,7 @@ __all__ = ['MODELS', 'ModelOptimisationConfig']
 
 from pathlib import Path
 
-import ObjectiveFunction
+import ObjectiveFunction_client
 from .config_dummy import DummyModel
 from .config_UKESM import UKESM
 from .config_MITgcm import MITgcm
@@ -14,13 +14,15 @@ MODELS = {'DummyModel': DummyModel,
           'HadCM3': HadCM3}
 
 
-class ModelOptimisationConfig(ObjectiveFunction.ObjFunConfig):
+class ModelOptimisationConfig(ObjectiveFunction_client.ObjFunConfig):
     setupCfgStr = """
     [setup]
+      app = string() # the name of ObjectiveFunction app
+      # the URL of the ObjectiveFunction server
+      baseurl = string(default=http://localhost:5000/api/)
       study = string() # the name of the study
       scenario = string() # the name of the scenario
       basedir = string() # the base directory
-      db = string(default=None) # SQLAlchemy DB connection string
       model = string(default=DummyModel)
       clone = string(default=None)
     """

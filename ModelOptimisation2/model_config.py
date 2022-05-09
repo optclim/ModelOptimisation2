@@ -2,7 +2,7 @@ import argparse
 import logging
 from pathlib import Path
 import shutil
-import ObjectiveFunction
+import ObjectiveFunction_client
 
 from .config import ModelOptimisationConfig
 
@@ -38,8 +38,8 @@ def main():
     else:
         try:
             runid, params = config.objectiveFunction.get_with_state(
-                ObjectiveFunction.LookupState.NEW, with_id=True,
-                new_state=ObjectiveFunction.LookupState.CONFIGURING)
+                ObjectiveFunction_client.LookupState.NEW, with_id=True,
+                new_state=ObjectiveFunction_client.LookupState.CONFIGURING)
         except LookupError as e:
             parser.error(e)
 
@@ -51,7 +51,7 @@ def main():
 
     if runid is not None:
         config.objectiveFunction.setState(
-            runid, ObjectiveFunction.LookupState.CONFIGURED)
+            runid, ObjectiveFunction_client.LookupState.CONFIGURED)
 
     print(modeldir)
 
