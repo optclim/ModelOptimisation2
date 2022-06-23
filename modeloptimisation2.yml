@@ -1,0 +1,21 @@
+name: modeloptimisation2
+
+dependencies:
+  - python=3.8
+  - pip
+  - f90nml
+  - requests
+  - configobj
+  - numpy>=1.21.0
+  - pandas
+  - sphinx<4.0
+  - nlopt
+  - scipy
+  - xarray
+  - pip:
+    - dfo-ls
+    - cylc-flow
+    - ObjectiveFunction-client @ git+https://github.com/optclim/ObjectiveFunction-client@main
+channels:
+  - defaults
+  - conda-forge
