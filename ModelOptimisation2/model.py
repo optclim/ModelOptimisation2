@@ -13,6 +13,13 @@ import f90nml
 
 @dataclass
 class NMLValue:
+    """a name list key/value pair
+
+     :param nmlfile: the name of the namelist file
+     :param nmlgroup: the name of the namelist
+     :param nmlkey: the key
+     :param value: the value
+    """
     nmlfile: Path
     nmlgroup: str
     nmlkey: str
@@ -32,11 +39,24 @@ class BaseNamelistValue:
 
     @abstractmethod
     def __call__(self, value) -> Sequence[NMLValue]:
+        """turn value into a list of namelist key/value pairs"""
         pass
 
 
 class SimpleNamelistValue(BaseNamelistValue):
+    """a simple namelist value
+
+    produces a single entry in a namelist
+
+    :param nmlfile: the name of the namelist file
+    :type nmlfile: str
+    :param nmlgroup: the name of the namelist
+    :type nmlgroup: str
+    :param nmlkey: the key
+    :type nmlkey: str
+    """
     def __init__(self, nmlfile: str, nmlgroup: str, nmlkey: str):
+        """constructor"""
         super().__init__(nmlfile, nmlgroup)
         self._nmlkey = nmlkey
 
@@ -45,6 +65,17 @@ class SimpleNamelistValue(BaseNamelistValue):
 
 
 class RepeatedNamelistValue(BaseNamelistValue):
+    """a repeated namelist value
+
+    produces a list of entries in a namelist with a repeated value
+
+    :param nmlfile: the name of the namelist file
+    :type nmlfile: str
+    :param nmlgroup: the name of the namelist
+    :type nmlgroup: str
+    :param nmlkeys: a list of namelist keys
+    :type nmlkeys: list
+    """
     def __init__(self, nmlfile: str, nmlgroup: str, nmlkeys: Sequence[str]):
         super().__init__(nmlfile, nmlgroup)
         self._nmlkeys = nmlkeys
@@ -57,6 +88,23 @@ class RepeatedNamelistValue(BaseNamelistValue):
 
 
 class InterpolatedValue(BaseNamelistValue):
+    """an interpolated namelist value
+
+    Interpolate a value on a piecewise linear function
+
+    :param nmlfile: the name of the namelist file
+    :type nmlfile: str
+    :param nmlgroup: the name of the namelist
+    :type nmlgroup: str
+    :param nmlkey1: the key for the value
+    :type nmlkey1: str
+    :param nmlkey2: the key for the interpolated value
+    :type nmlkey2: str
+    :param x: array of x coordinates of the nodes the piecewise linear function
+    :type x: arraylike
+    :param y: array of y coordinates of the nodes the piecewise linear function
+    :type y: arraylike
+     """
     def __init__(self, nmlfile: str, nmlgroup: str,
                  nmlkey1: str, nmlkey2: str,
                  x: ArrayLike, y: ArrayLike):
@@ -74,9 +122,16 @@ class InterpolatedValue(BaseNamelistValue):
 
 
 class NamelistModel:
+    """a model configured by namelists
+
+    :param directory: the base directory where model configuration is kept
+    """
+
     NAMELIST_MAP: Dict[str, BaseNamelistValue] = {}
 
     def __init__(self, directory: Path):
+        """constructor"""
+
         self._directory = directory
 
     @property
@@ -85,6 +140,10 @@ class NamelistModel:
 
     def process_params(self, params: Dict[str, Any]) -> \
             Dict[Path, Dict[str, Dict[str, Any]]]:
+        """map dictionary of parameters to dictionary of namelist files
+
+        :param params: a dictionary containing parameter names and values
+        """
         output: Dict[Path, Dict[str, Dict[str, Any]]] = {}
         # map input parameters to output namelist files
         for key in params:
@@ -99,6 +158,10 @@ class NamelistModel:
         return output
 
     def write_params(self, params: Dict[str, Any]) -> None:
+        """modify namelists with parameters from dictionary
+
+        :param params: a dictionary containing parameter names and values
+        """
         output = self.process_params(params)
 
         # write output namelist files
