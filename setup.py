@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from sphinx.setup_command import BuildDoc
 
 name = 'ModelOptimisation2'
 version = '0.1'
@@ -14,9 +15,22 @@ setup(
         'f90nml',
         'ObjectiveFunction_client',
     ],
+    cmdclass={'build_sphinx': BuildDoc},
+    command_options={
+        'build_sphinx': {
+            'project': ('setup.py', name),
+            'version': ('setup.py', version),
+            'release': ('setup.py', release),
+            'copyright': ('setup.py', author),
+            'source_dir': ('setup.py', 'docs')}},
+    setup_requires=['sphinx'],
     extras_require={
         'lint': [
             'flake8>=3.5.0',
+        ],
+        'docs': [
+            'sphinx<4.0',
+            'sphinx_rtd_theme',
         ],
         'testing': [
             'pytest',
