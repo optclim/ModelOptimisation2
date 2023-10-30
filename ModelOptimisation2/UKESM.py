@@ -54,7 +54,15 @@ class UKESM(NamelistModel):
         'iau_nontrop_max_p': SimpleNamelistValue(
             'app/um/rose-app.conf', 'iau_nl', 'iau_nontrop_max_p'),
         'diagcloud_qn_compregimelimit': SimpleNamelistValue(
-            'app/um/rose-app.conf', 'iau_nl', 'diagcloud_qn_compregimelimit')}
+            'app/um/rose-app.conf', 'iau_nl', 'diagcloud_qn_compregimelimit'),
+        'DP_CORR_STRAT':SimpleNamelistValue( 
+            'app/um/rose-app.conf', 'run_radiation','dp_corr_strat'),
+        'TWO_D_FSD_FACTOR':SimpleNamelistValue(
+            'app/um/rose-app.conf','run_radiation','two_d_fsd_factor'),
+        'ENT_FAC_DP':SimpleNamelistValue(
+            'app/um/rose-app.conf','run_convection','ent_fac_dp'),
+        'AI':SimpleNamelistValue(
+            'app/um/rose-app.conf','run_precip','ai') }
 
     def write_params(self, params: Dict[str, Any]) -> None:
         output = self.process_params(params)
