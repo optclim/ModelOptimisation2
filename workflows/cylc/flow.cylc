@@ -1,0 +1,46 @@
+[scheduler]
+#    allow implicit tasks = True
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    [[graph]]
+        P1 = """
+             optimise:new? => configure => run => postprocess
+             optimise:wait? => wait
+             configure[-P1]:started|wait[-P1] => optimise
+        """
+[runtime]
+  [[root]]
+     [[[environment]]]
+     CFG = $CYLC_WORKFLOW_RUN_DIR/modelopt.cfg
+  [[optimise]]
+  script = """
+  status=$(mo2-optimise $CFG || true)
+  cylc message -- "${CYLC_SUITE_NAME}" "${CYLC_TASK_JOB}" $status
+
+  """
+     [[[outputs]]]
+     wait = "waiting"
+     new = "new"
+
+  [[configure]]
+  script = mo2-configure $CFG
+
+  [[run]]
+  script = """
+  # get configured run
+  MODELDIR=$(mo2-transition $CFG CONFIGURED ACTIVE) || exit 1
+  # run it
+  cd $MODELDIR
+  dummy config.nml results.nc || exit 1
+  # mark it as completed
+  mo2-transition $CFG ACTIVE RUN -i || exit 1
+  """
+
+  [[postprocess]]
+  script = mo2-simobs_dummy $CFG
+
+  [[wait]]
+  script = """
+  sleep 10
+  """

@@ -1,1 +1,2 @@
-from .UKESM import UKESM  # noqa F401
+from .config import *  # noqa F401, F403
+from .model import *  # noqa F401, F403

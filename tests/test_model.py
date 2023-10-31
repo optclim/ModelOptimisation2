@@ -1,10 +1,10 @@
 import pytest
 from pathlib import Path
-from ModelOptimisation2.model import SimpleNamelistValue
+from ModelOptimisation2.model import SimpleNamelistValue, RepeatedNamelistValue
+from ModelOptimisation2.model import InterpolatedValue
 from ModelOptimisation2.model import NamelistModel
 
-NML1 = \
-"""&grp1
+NML1 = """&grp1
     p1 = {paramA}
     p2 = {paramB}
 /
@@ -14,8 +14,7 @@ NML1 = \
 /
 """
 
-NML2 = \
-"""&grp1
+NML2 = """&grp1
     p1 = {paramD}
 /
 """
@@ -46,8 +45,8 @@ class ExampleModel(NamelistModel):
         'paramD': SimpleNamelistValue('test2.nml', 'grp1', 'p1')}
 
 
-def test_simplenmlvalue():
-    nmlfile = Path('test.nml')
+def test_SimpleNamelistValue():
+    nmlfile = 'test.nml'
     nmlgroup = 'test_grp'
     nmlkey = 'test_param'
     nmlval = 42
@@ -60,6 +59,46 @@ def test_simplenmlvalue():
     assert v[0].nmlgroup == nmlgroup
     assert v[0].nmlkey == nmlkey
     assert v[0].value == nmlval
+
+
+def test_RepeatedNamelistValue():
+    nmlfile = 'test.nml'
+    nmlgroup = 'test_grp'
+    nmlkeys = ['p1', 'p2', 'p3']
+    nmlval = 42
+
+    test_param = RepeatedNamelistValue(nmlfile, nmlgroup, nmlkeys)
+
+    v = test_param(nmlval)
+
+    for i in range(len(nmlkeys)):
+        assert v[i].nmlfile == nmlfile
+        assert v[i].nmlgroup == nmlgroup
+        assert v[i].nmlkey == nmlkeys[i]
+        assert v[i].value == nmlval
+
+
+def test_InterpolatedValue():
+    nmlfile = 'test.nml'
+    nmlgroup = 'test_grp'
+    nmlkey1 = 'param'
+    nmlkey2 = 'interpolated_param'
+    nmlval = 42
+
+    test_param = InterpolatedValue(
+        nmlfile, nmlgroup, nmlkey1, nmlkey2,
+        [0, 21, 63], [0, 20, 10])
+
+    v = test_param(nmlval)
+    assert len(v) == 2
+    assert v[0].nmlfile == nmlfile
+    assert v[0].nmlgroup == nmlgroup
+    assert v[0].nmlkey == nmlkey1
+    assert v[0].value == nmlval
+    assert v[1].nmlfile == nmlfile
+    assert v[1].nmlgroup == nmlgroup
+    assert v[1].nmlkey == nmlkey2
+    assert v[1].value == 15
 
 
 def test_model_fail(rundir):

@@ -1,30 +1,59 @@
 import argparse
 import logging
-import json
 from pathlib import Path
+import shutil
+import ObjectiveFunction_client
 
-from .UKESM import UKESM
-
-MODELS = {'UKESM': UKESM}
+from .config import ModelOptimisationConfig
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('parameters', type=Path,
-                        help="name of file containing parameters to apply")
-    parser.add_argument('modeldir', type=Path,
-                        help="name of model directory")
-    parser.add_argument('-t', '--model-type', choices=MODELS.keys(),
-                        default='UKESM',
-                        help="select the model type")
+    parser.add_argument('config', type=Path,
+                        help="name of configuration file")
+    parser.add_argument('-d', '--default-values', action='store_true',
+                        default=False,
+                        help="use default values from config file")
+    parser.add_argument('-C', '--clone',
+                        help="model setup to clone")
     args = parser.parse_args()
 
-    params = json.loads(args.parameters.read_text())
+    config = ModelOptimisationConfig(args.config)
+    modeldir = config.basedir
 
-    model = MODELS[args.model_type](args.modeldir)
+    if args.clone is not None:
+        clonedir = Path(args.clone)
+    else:
+        clonedir = config.cloneDir
+    if clonedir is None:
+        parser.error('no clone directory specified')
+    if not clonedir.is_dir():
+        parser.error(f'clone directory {clonedir} does not exist')
+
+    if args.default_values:
+        params = config.values
+        runid = None
+    else:
+        try:
+            runid, params = config.objectiveFunction.get_with_state(
+                ObjectiveFunction_client.LookupState.NEW, with_id=True,
+                new_state=ObjectiveFunction_client.LookupState.CONFIGURING)
+        except LookupError as e:
+            parser.error(e)
+
+    modeldir = config.modelDir(runid, create=True)
+    shutil.copytree(clonedir, modeldir, dirs_exist_ok=True)
+
+    model = config.model(modeldir)
     model.write_params(params)
+
+    if runid is not None:
+        config.objectiveFunction.setState(
+            runid, ObjectiveFunction_client.LookupState.CONFIGURED)
+
+    print(modeldir)
 
 
 if __name__ == '__main__':

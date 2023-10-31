@@ -1,0 +1,8 @@
+f90nml
+sphinx<4.0
+jinja2<3
+itsdangerous<2.0
+markupsafe<2.1
+flake8
+sphinx_rtd_theme
+git+https://github.com/optclim/ObjectiveFunction-client#egg=ObjectiveFunction-client
